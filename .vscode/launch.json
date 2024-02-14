@@ -1,0 +1,49 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "java",
+            "name": "GameManager",
+            "request": "launch",
+            "mainClass": "GameManager",
+            "projectName": "RobotsTP_2dca3fd4"
+        },
+        {
+            "type": "java",
+            "name": "Current File",
+            "request": "launch",
+            "mainClass": "${file}"
+        },
+        {
+            "type": "java",
+            "name": "Monde",
+            "request": "launch",
+            "mainClass": "Monde",
+            "projectName": "RobotsTP_2dca3fd4"
+        },
+        {
+            "type": "java",
+            "name": "Robot",
+            "request": "launch",
+            "mainClass": "Robot",
+            "projectName": "RobotsTP_2dca3fd4"
+        },
+        {
+            "type": "java",
+            "name": "RobotJumper",
+            "request": "launch",
+            "mainClass": "RobotJumper",
+            "projectName": "RobotsTP_2dca3fd4"
+        },
+        {
+            "type": "java",
+            "name": "Test",
+            "request": "launch",
+            "mainClass": "Test",
+            "projectName": "RobotsTP_2dca3fd4"
+        }
+    ]
+}
