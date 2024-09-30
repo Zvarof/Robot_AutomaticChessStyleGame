@@ -6,6 +6,13 @@
     "configurations": [
         {
             "type": "java",
+            "name": "ScreenFinalResult",
+            "request": "launch",
+            "mainClass": "ScreenFinalResult",
+            "projectName": "RobotsTP_2dca3fd4"
+        },
+        {
+            "type": "java",
             "name": "GameManager",
             "request": "launch",
             "mainClass": "GameManager",

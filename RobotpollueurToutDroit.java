@@ -1,3 +1,5 @@
+import java.util.ArrayList;
+
 public class RobotpollueurToutDroit extends Robot {
     // Attributes
     int ColDepart;
@@ -19,5 +21,7 @@ public class RobotpollueurToutDroit extends Robot {
             T.add_dirty(i, ColDepart);
         }
     }
+
+    public void moveAndAct(Robot R, ScreenPlaying graph, Monde map, ArrayList<Robot> robots_inGame){};
 }
 

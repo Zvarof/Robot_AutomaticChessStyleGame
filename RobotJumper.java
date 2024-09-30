@@ -1,5 +1,6 @@
 import java.util.ArrayList;
 import java.util.Arrays;
+import javax.swing.*;
 
 public class RobotJumper extends Robot {
     // Attributes
@@ -15,6 +16,8 @@ public class RobotJumper extends Robot {
         jump_back = true;
         super.set_weight(250);
         super.set_initiative(800);
+        super.set_name("Jumper");
+        super.set_price(15);
     }
 
     public RobotJumper(Monde m, int posx, int posy, int jump_range, String team){
@@ -24,6 +27,8 @@ public class RobotJumper extends Robot {
         this.jump_back = true;
         super.set_weight(250);
         super.set_initiative(800);
+        super.set_name("Jumper");
+        super.set_price(15);
     }
 
     public RobotJumper(Monde m, int posx, int posy, int jump_range, boolean jump_diagonal, String team){
@@ -33,6 +38,8 @@ public class RobotJumper extends Robot {
         this.jump_back = true;
         super.set_weight(250);
         super.set_initiative(800);
+        super.set_name("Jumper");
+        super.set_price(15);
     }
 
     public RobotJumper(Monde m, int posx, int posy, int jump_range, boolean jump_diagonal, boolean jump_back, String team){
@@ -42,6 +49,14 @@ public class RobotJumper extends Robot {
         this.jump_back = jump_back;
         super.set_weight(250);
         super.set_initiative(800);
+        super.set_name("Jumper");
+        super.set_price(15);
+    }
+
+    public RobotJumper(String team){
+        super(team);
+        super.set_name("Jumper");
+        super.set_price(15);
     }
 
     // Getters
@@ -116,97 +131,113 @@ public class RobotJumper extends Robot {
                 if(super.get_team() == "Dirty"){
                     super.getMonde().add_dirty(super.get_posy(), super.get_posx());
                 } else if (super.get_team() == "Clean"){
-                    super.getMonde().delete_dirty(super.get_posy(),super.get_posx());
+                    super.getMonde().add_clean(super.get_posy(),super.get_posx());
                 }
             }
         }
     }
 
     @Override
-    public void moveAndAct(Robot RobotJumper, GraphiqueInterface graph, Monde map, ArrayList<Robot> robots_inGame) throws InterruptedException{
+    public void moveAndAct(Robot RobotJumper, ScreenPlaying graph, Monde map, ArrayList<Robot> robots_inGame){
         RobotJumper R = (RobotJumper) RobotJumper;         // Down-casting to access RobotBasic specific attributes
-        for (int i=0; i<R.get_step(); i++){
-            if (!R.get_functionning()) {
-                return;
+        if (!R.get_functionning()) {return;}
+
+        int[] previous_move = new int[2];
+        int[][] possibleMove;
+        int randomChooser;
+        int nb_option;
+
+        // Generating the different moving options
+        if(jump_diagonal){
+            possibleMove = new int[8][2];
+            possibleMove[0] = new int[]{-jump_range, 0};                // TOP
+            possibleMove[1] = new int[]{0, jump_range};                 // RIGHT
+            possibleMove[2] = new int[]{jump_range, 0};                 // BOT
+            possibleMove[3] = new int[]{0, -jump_range};                // LEFT
+            possibleMove[4] = new int[]{-jump_range, jump_range};       // DIAG UP-RIGHT
+            possibleMove[5] = new int[]{jump_range, jump_range};        // DIAG BOT-RIGHT
+            possibleMove[6] = new int[]{jump_range, -jump_range};       // DIAG BOT-LEFT
+            possibleMove[7] = new int[]{-jump_range, -jump_range};      // DIAG UP-LEFT
+            nb_option = 8;
+        } else {
+            possibleMove = new int[4][2];
+            possibleMove[0] = new int[]{-jump_range, 0};                // TOP
+            possibleMove[1] = new int[]{0, jump_range};                 // RIGHT
+            possibleMove[2] = new int[]{jump_range, 0};                 // BOT
+            possibleMove[3] = new int[]{0, -jump_range};                // LEFT
+            nb_option = 4;
+        }
+
+        // Choosing randomly one moving option
+        randomChooser = (int) (Math.random()*nb_option);
+
+        // Check if previous_move == next_move, if so, regenerate an option until this isn't the case anymore
+        if (!R.getJumpBack() && Arrays.equals(possibleMove[randomChooser], previous_move)){
+            while (Arrays.equals(possibleMove[randomChooser], previous_move)){
+                randomChooser = (int) (Math.random()*nb_option);                          // re-randomize until not going backward (previous position)
             }
+        }
 
-            try {                
-                Thread.sleep(1000);
-            } catch (InterruptedException e){
-                Thread.currentThread().interrupt();
-            }
+        // Get next x, y and current direction for ease of use later
+        int next_y = R.get_posy() + possibleMove[randomChooser][0];
+        int next_x = R.get_posx() + possibleMove[randomChooser][1];
+        if (Utilities.IsOutOfMap(next_y, next_x, graph.get_gridSizeY(), graph.get_gridSizeX())){
+            graph.get_cells()[R.get_posy()][R.get_posx()].setIcon(null);
+            graph.get_cells()[R.get_posy()][R.get_posx()].setText("");
+            Utilities.dealWithOutOfMap(R);
+            return;
+        }
+        int[] direction = new int[]{possibleMove[randomChooser][0], possibleMove[randomChooser][1]};
 
-            int[] previous_move = new int[2];
-            int[][] possibleMove;
-            int randomChooser;
-            int nb_option;
+        // Get the list of robot in the path and actualise previous move tried (even if not effective)
+        ArrayList<Robot> robotInPathList = Utilities.whoIsInMyPath(next_y, next_x, direction, robots_inGame);
+        previous_move[0] = -direction[0];
+        previous_move[1] = -direction[1];
 
-            if(jump_diagonal){
-                possibleMove = new int[8][2];
-                possibleMove[0] = new int[]{-jump_range, 0};                // TOP
-                possibleMove[1] = new int[]{0, jump_range};                 // RIGHT
-                possibleMove[2] = new int[]{jump_range, 0};                 // BOT
-                possibleMove[3] = new int[]{0, -jump_range};                // LEFT
-                possibleMove[4] = new int[]{-jump_range, jump_range};       // DIAG UP-RIGHT
-                possibleMove[5] = new int[]{jump_range, jump_range};        // DIAG BOT-RIGHT
-                possibleMove[6] = new int[]{jump_range, -jump_range};       // DIAG BOT-LEFT
-                possibleMove[7] = new int[]{-jump_range, -jump_range};      // DIAG UP-LEFT
-                nb_option = 8;
-            } else {
-                possibleMove = new int[4][2];
-                possibleMove[0] = new int[]{-jump_range, 0};                // TOP
-                possibleMove[1] = new int[]{0, jump_range};                 // RIGHT
-                possibleMove[2] = new int[]{jump_range, 0};                 // BOT
-                possibleMove[3] = new int[]{0, -jump_range};                // LEFT
-                nb_option = 4;
-            }
+        // Check if the next position is occupied
+        if (robotInPathList.size() == 0){
+            // Actualise new position and Robot image position
+            graph.get_cells()[R.get_posy()][R.get_posx()].setIcon(null);
+            graph.get_cells()[R.get_posy()][R.get_posx()].setText("");
+            R.set_posy(next_y);
+            R.set_posx(next_x);
+            graph.get_cells()[R.get_posy()][R.get_posx()].setIcon(graph.getImageIconForRobot(R));
+            // Action in the new position - pollute if in team true, else depolute
+            Utilities.ActDirtyClean(R, graph, map);
 
-            randomChooser = (int) (Math.random()*nb_option);
+        } else {
+            // updating graphic interface
+            graph.get_cells()[R.get_posy()][R.get_posx()].setIcon(null);
+            graph.get_cells()[R.get_posy()][R.get_posx()].setText("");
+            R.set_posy(next_y);
+            R.set_posx(next_x);
+            Icon temp = graph.get_cells()[R.get_posy()][R.get_posx()].getIcon();
+            graph.get_cells()[R.get_posy()][R.get_posx()].setIcon(graph.getImageIconForRobot(R));
 
-            // Check for previous move
-            if (!R.getJumpBack() && Arrays.equals(possibleMove[randomChooser], previous_move)){
-                while (Arrays.equals(possibleMove[randomChooser], previous_move)){
-                    randomChooser = (int) (Math.random()*nb_option);                          // re-randomize until not going backward (previous position)
+            // managing the jump on top of other robots 
+            for (int j=1; j<robotInPathList.size()+1; j++){                               // Do not kill if Glasse Canon in first position
+                if (j < robotInPathList.size()){
+                    if (robotInPathList.get(j).getName() == "GlasseCanon"){
+                        Utilities.dealWithOutOfMap(robotInPathList.get(j));                 
+                        temp = null;                                                        // Might cause issue, to verify !!!!!
+                    }
                 }
+                graph.get_cells()[R.get_posy()][R.get_posx()].setIcon(temp);
+                R.set_posy(R.get_posy() + direction[0]);
+                R.set_posx(R.get_posx() + direction[1]);
+                if (Utilities.IsOutOfMap(R.get_posy(), R.get_posx(), graph.get_gridSizeY(), graph.get_gridSizeX())){
+                    Utilities.dealWithOutOfMap(R);
+                    return;
+                }
+                temp = graph.get_cells()[R.get_posy()][R.get_posx()].getIcon();
+                graph.get_cells()[R.get_posy()][R.get_posx()].setIcon(graph.getImageIconForRobot(R));
             }
 
-            // Get next x, y and current direction for ease of use later
-            int next_y = R.get_posy() + possibleMove[randomChooser][0];
-            int next_x = R.get_posx() + possibleMove[randomChooser][1];
-            int[] direction = new int[]{possibleMove[randomChooser][0], possibleMove[randomChooser][1]};
-
-            // Get the list of robot in the path
-            ArrayList<Robot> robotInPathList = Utilities.whoIsInMyPath(next_y, next_x, direction, robots_inGame);
-
-            if (next_y + robotInPathList.size()*possibleMove[randomChooser][0] < 0 || 
-            next_y + robotInPathList.size()*possibleMove[randomChooser][0] >= map.get_nbL() || 
-            next_x + robotInPathList.size()*possibleMove[randomChooser][1] < 0 || 
-            next_x + robotInPathList.size()*possibleMove[randomChooser][1] >= map.get_nbC()) {
-                R.set_functionning(false);
-                break;
-            }
-
-            // Check if the next position is occupied
-            if (robotInPathList.size() == 0){
-                // Actualise previous_move
-                previous_move[0] = -direction[0];
-                previous_move[1] = -direction[1];
-
-                ////// CONTINUE HERE !!!
-            }
+            // Action in the last position (without robot) - pollute if in team true, else depolute
+            Utilities.ActDirtyClean(R, graph, map);
         }
     }
 
     // Main (try)
-    public static void main(String[] args){
-        Monde Monde1 = new Monde();
-        System.out.println("World before Robot Jumper going in");
-        Monde1.displayWorldMatrix();
-
-        RobotJumper RobotJumper1 = new RobotJumper(Monde1, 7, 4, "Clean");
-        RobotJumper1.parcourir();
-
-        System.out.println("World before Robot Jumper after going in");
-        Monde1.displayWorldMatrix();
-    }
+    public static void main(String[] args){}
 }

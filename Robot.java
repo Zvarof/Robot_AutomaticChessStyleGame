@@ -14,6 +14,7 @@ public abstract class Robot {
     private int weight;
     private int initiative;
     private int step = 1;                   // default as 1
+    private int price;
     private String team = "Undefined";      
     private static int robotCreated = 0;
 
@@ -38,6 +39,20 @@ public abstract class Robot {
         robotCreated += 1;
     }
 
+    /* Robot using those constructors are not readily playable as such, 
+    they are lacking some attribute */
+    public Robot(String team, String name, int posy, int posx){
+        this.posy = posy;
+        this.posx = posx;
+        this.functionning = true;
+        this.team = team;
+    }
+
+    public Robot(String team){
+        this.team = team;
+        this.functionning = true;
+    }
+
     // Getters
 
     public int get_ID(){return ID;}
@@ -49,6 +64,7 @@ public abstract class Robot {
     public int get_weight(){return weight;}
     public int get_initiative(){return initiative;}
     public int get_step(){return step;}
+    public int get_price(){return price;}
     public String get_team(){return team;}
 
     // Setters
@@ -60,10 +76,12 @@ public abstract class Robot {
     public void set_weight(int weight){this.weight = weight;}
     public void set_initiative(int initiative){this.initiative = initiative;}
     public void set_step(int step){this.step = step;}
+    public void set_price(int price){this.price = price;}
     public void set_team(String team){this.team = team;}
 
     // Methods
 
+    // enable to move coordonate of a Robot to a new position, if available.
     public void MoveTo(int i, int j) throws IndexOutOfBoundsException {
         int nbL = m.get_world_matrix().length;
         int nbC = m.get_world_matrix()[0].length;
@@ -75,8 +93,11 @@ public abstract class Robot {
         }
     }
 
+    // manage the robot movements
     public abstract void parcourir() throws IndexOutOfBoundsException;
-    public abstract void moveAndAct(Robot R, GraphiqueInterface graph, Monde map, ArrayList<Robot> robots_inGame) throws InterruptedException;
+
+    // manage the robot movements and actions
+    public abstract void moveAndAct(Robot R, ScreenPlaying graph, Monde map, ArrayList<Robot> robots_inGame);
 
     // Main
     public static void main(String[] args){}

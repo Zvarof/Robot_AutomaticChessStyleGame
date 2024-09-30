@@ -4,20 +4,20 @@ public class Monde {
     // Attributes
     private int nbL;
     private int nbC;
-    private boolean[][] world_matrix;
+    private String[][] world_matrix;
 
     // Constructors
     public Monde(){
-        nbL = 10;
-        nbC = 10;
-        world_matrix = new boolean[nbL][nbC];
+        nbL = 9;
+        nbC = 9;
+        world_matrix = new String[nbL][nbC];
         for (int i=0; i<nbL; i++){
-            Arrays.fill(world_matrix[i], false);
+            Arrays.fill(world_matrix[i], "neutral");
         }
     }
 
     // Getters
-    public boolean[][] get_world_matrix() {return world_matrix;}
+    public String[][] get_world_matrix() {return world_matrix;}
     public int get_nbL() {return nbL;}
     public int get_nbC() {return nbC;}
 
@@ -31,15 +31,15 @@ public class Monde {
         if (i > nbL || i < 0 || j > nbC || j < 0){
             throw new IndexOutOfBoundsException("The given indexes (" + i + "," + j + ") are invalid");
         } else {
-            world_matrix[i][j] = true;
+            world_matrix[i][j] = "dirty";
         }
     }
 
-    public void delete_dirty(int i, int j) throws IndexOutOfBoundsException {
+    public void add_clean(int i, int j) throws IndexOutOfBoundsException {
         if (i > nbL || i < 0 || j > nbC || j < 0){
             throw new IndexOutOfBoundsException("The given indexes (" + i + "," + j + ") are invalid");
         } else {
-            world_matrix[i][j] = false;
+            world_matrix[i][j] = "clean";
         }     
     }
 
@@ -47,7 +47,7 @@ public class Monde {
         if (i > nbL || i < 0 || j > nbC || j < 0){
             throw new IndexOutOfBoundsException("The given indexes (" + i + "," + j + ") are invalid");
         } else {
-            return world_matrix[i][j];
+            return world_matrix[i][j].equals("dirty");
         }
     }
 
@@ -55,7 +55,7 @@ public class Monde {
         int total = 0;
         for (int i=0; i<nbL; i++){
             for (int j=0; j>nbC; j++){
-                if (world_matrix[i][j]){
+                if (world_matrix[i][j].equals("dirty")){
                     total += 1;
                 }
             }
@@ -67,7 +67,7 @@ public class Monde {
         for (int i=0; i<world_matrix.length; i++){
             System.out.println();
             for (int j=0; j<world_matrix[0].length; j++){
-                if (world_matrix[i][j]){
+                if (world_matrix[i][j].equals("dirty")){
                     System.out.print("X ");
                 } else {
                     System.out.print("V ");
